@@ -24,6 +24,7 @@ services:
     volumes:
       - ${PRODUCT_PWD}:/www:rw
       - ${PRODUCT_PWD}/php/phenix:${PRODUCT_PWD}/php/phenix:rw
+      - /Users/tian:/Users/tian
         #- ./Users/tian/opt/project/html:/app/vendor
       - ${RECORD_PWD}/php56/log:/var/log/php:rw # 日志
       - ./php56/conf/php-fpm.conf:/usr/local/etc/php-fpm.d/php-fpm.conf:ro

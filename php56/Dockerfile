@@ -72,6 +72,23 @@ RUN curl -fsSL 'http://pecl.php.net/get/gmagick-1.1.7RC3.tgz' -o gmagick.tgz \
     && rm -r gmagick \
     && docker-php-ext-enable gmagick
 
+RUN curl -fsSL 'http://www.xunsearch.com/scws/down/scws-1.2.3.tar.bz2' -o scws.bz2 \
+    && mkdir -p scws \
+    && tar -xjf scws.bz2 -C scws --strip-components=1 \
+    && rm scws.bz2 \
+    && ( \
+        cd scws \
+        && ./configure --prefix=/usr/local/scws \
+        && make && make install \
+        && cd phpext \
+        && phpize \
+        && ./configure --with-scws=/usr/local/scws/ \
+        && make -j$(nproc) \
+        && make install \
+    ) \
+    && rm -r scws \
+    && docker-php-ext-enable scws
+
  
 # composer 
 # composer中国镜像
