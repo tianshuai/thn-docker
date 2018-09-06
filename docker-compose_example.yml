@@ -1,0 +1,89 @@
+version: '3.2'
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    volumes:
+      - ${PRODUCT_PWD}:/opt/project:rw
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${RECORD_PWD}/nginx/log:/var/log/nginx
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    links:
+      - php56:php56
+    restart: always
+    command: nginx -g 'daemon off;'
+  php56:
+    build: ./php56
+    container_name: php56
+    ports:
+      - "9000:9000"
+    volumes:
+      - ${PRODUCT_PWD}:/www:rw
+      - ${PRODUCT_PWD}/php/phenix:${PRODUCT_PWD}/php/phenix:rw
+      - /Users/tian:/Users/tian
+        #- ./Users/tian/opt/project/html:/app/vendor
+      - ${RECORD_PWD}/php56/log:/var/log/php:rw # 日志
+      - ./php56/conf/php-fpm.conf:/usr/local/etc/php-fpm.d/php-fpm.conf:ro
+      - ./php56/conf/php.ini:/usr/local/etc/php/php.ini:ro
+    #command:
+    #  - '--fpm-config'
+    depends_on:
+      - mongo
+      - redis
+    #php7:
+    #build: ./php7
+    #container_name: php7
+    #ports:
+    #  - "9001:9001"
+    #volumes:
+    #  - /Users/tian/opt/project:/app:rw
+    #    #- ./Users/tian/opt/project/html:/app/vendor
+    #  - /data/docker/php7/log:/var/log/php:rw # 日志
+    #  - ./php7/conf/php-fpm.conf:/usr/local/etc/php-fpm.d/php-fpm.conf:ro
+  mysql:
+    build: ./mysql
+    container_name: mysql
+    volumes:
+      - ${RECORD_PWD}/mysql/db:/var/lib/mysql
+      - ./mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ${RECORD_PWD}/mysql/log:/var/log/mysql:rw
+    ports: 
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    restart: unless-stopped
+  mongo:
+    build: ./mongo
+    container_name: mongo
+    volumes:
+      - ./mongo/conf/mongodb.conf:/etc/mongod.conf:ro
+      - ${RECORD_PWD}/mongo/db:/data/db:rw
+      - ${RECORD_PWD}/mongo/log:/var/log/mongodb:rw
+    ports:
+      - "27017:27017"
+    restart: always
+    #environment:
+      #MONGO_INITDB_ROOT_USERNAME: root
+      #MONGO_INITDB_ROOT_PASSWORD: 
+      #MONGO_LOG_DIR: /var/log/mongodb/mongodb.log
+    command:
+      - '--smallfiles'
+      - '-f'
+      - '/etc/mongod.conf'
+  redis:
+    build: ./redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${RECORD_PWD}/redis/db:/data:rw
+      - ${RECORD_PWD}/redis/log:/var/log/redis:rw
+      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    restart: always
+    command:
+      - '/usr/local/etc/redis/redis.conf'
+
