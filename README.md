@@ -7,7 +7,6 @@
 * nginx
 * mongo
 * redis
-* python3
 * centos
 
 #### docker配置目录结构
@@ -26,7 +25,7 @@
 > ---Dockerfile  
 > --nginx/  
 > ---Dockerfile  
-> --python3/  
+> --centos/  
 > ---Dockerfile  
 > --mongo/  
 > ---Dockerfile  
@@ -44,7 +43,7 @@
 > --redis/  
 > ---db/  
 > ---log/  
-> --python3/  
+> --centos/  
 > ---log/  
 > ---pid/   
 
