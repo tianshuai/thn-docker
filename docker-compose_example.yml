@@ -1,89 +1,71 @@
-version: '3.2'
+version: '3'
 services:
+  data_volume:  # 公共数据卷latest
+    build: ./data_volume
+    container_name: data_volume
+    volumes:
+      - ${RECORD_PWD}:/data
+      - ${CONF_PWD}:/opt/etc
+      - ${PRODUCT_PWD}:/opt/project
   nginx:
     build: ./nginx
     container_name: nginx
-    volumes:
-      - ${PRODUCT_PWD}:/opt/project:rw
-      - ./nginx/conf/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ${RECORD_PWD}/nginx/log:/var/log/nginx
     ports:
       - "80:80"
-      - "8080:8080"
       - "443:443"
-    links:
-      - php56:php56
-    restart: always
-    command: nginx -g 'daemon off;'
-  php56:
-    build: ./php56
-    container_name: php56
-    ports:
-      - "9000:9000"
     volumes:
-      - ${PRODUCT_PWD}:/www:rw
-      - ${PRODUCT_PWD}/php/phenix:${PRODUCT_PWD}/php/phenix:rw
-      - /Users/tian:/Users/tian
-        #- ./Users/tian/opt/project/html:/app/vendor
-      - ${RECORD_PWD}/php56/log:/var/log/php:rw # 日志
-      - ./php56/conf/php-fpm.conf:/usr/local/etc/php-fpm.d/php-fpm.conf:ro
-      - ./php56/conf/php.ini:/usr/local/etc/php/php.ini:ro
+      - ${CONF_PWD}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    volumes_from:
+      - data_volume
+    networks:
+      - app-net
+    restart: always 
     #command:
-    #  - '--fpm-config'
-    depends_on:
-      - mongo
-      - redis
-    #php7:
-    #build: ./php7
-    #container_name: php7
-    #ports:
-    #  - "9001:9001"
-    #volumes:
-    #  - /Users/tian/opt/project:/app:rw
-    #    #- ./Users/tian/opt/project/html:/app/vendor
-    #  - /data/docker/php7/log:/var/log/php:rw # 日志
-    #  - ./php7/conf/php-fpm.conf:/usr/local/etc/php-fpm.d/php-fpm.conf:ro
-  mysql:
-    build: ./mysql
-    container_name: mysql
-    volumes:
-      - ${RECORD_PWD}/mysql/db:/var/lib/mysql
-      - ./mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ${RECORD_PWD}/mysql/log:/var/log/mysql:rw
-    ports: 
-      - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: "123456"
-    restart: unless-stopped
-  mongo:
+    #  - 'nginx'
+  mongo:  # v4.2
     build: ./mongo
     container_name: mongo
-    volumes:
-      - ./mongo/conf/mongodb.conf:/etc/mongod.conf:ro
-      - ${RECORD_PWD}/mongo/db:/data/db:rw
-      - ${RECORD_PWD}/mongo/log:/var/log/mongodb:rw
+    volumes_from:
+      - data_volume
     ports:
       - "27017:27017"
+    networks:
+      app-net:
+        ipv4_address: 170.0.0.7
     restart: always
-    #environment:
-      #MONGO_INITDB_ROOT_USERNAME: root
-      #MONGO_INITDB_ROOT_PASSWORD: 
-      #MONGO_LOG_DIR: /var/log/mongodb/mongodb.log
     command:
-      - '--smallfiles'
+      ### --smallfiles option is no longer supported in newer mongodb versions starting from 4.2
+      #- '--smallfiles' 
       - '-f'
-      - '/etc/mongod.conf'
-  redis:
+      - '/opt/etc/mongod.conf'
+  redis:  # v6.0
     build: ./redis
     container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - ${RECORD_PWD}/redis/db:/data:rw
-      - ${RECORD_PWD}/redis/log:/var/log/redis:rw
-      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
+    volumes_from:
+      - data_volume
     restart: always
+    networks:
+      app-net:
+        ipv4_address: 170.0.0.6
     command:
-      - '/usr/local/etc/redis/redis.conf'
+      - '/opt/etc/redis.conf'
+  centos:  # centos8
+    build: ./centos
+    container_name: centos
+    volumes_from:
+      - data_volume
+    networks:
+      app-net:
+        ipv4_address: 170.0.0.5
+    ports:
+      - "8004:8004"
+networks:
+  app-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 170.0.0.1/16
+
 
