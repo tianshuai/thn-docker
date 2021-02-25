@@ -61,6 +61,7 @@ services:
         ipv4_address: 170.0.0.5
     ports:
       - "8004:8004"
+      - "8002:8002"
 networks:
   app-net:
     driver: bridge

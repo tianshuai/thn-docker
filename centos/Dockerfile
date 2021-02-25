@@ -9,7 +9,8 @@ RUN yum -y update && \
     yum clean all
 
 # 基础库
-RUN yum -y install vim sudo && \
+RUN yum -y install epel-release vim sudo && \
+    yum -y install screen && \
     yum clean all
 
 # python
