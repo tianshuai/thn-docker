@@ -38,6 +38,25 @@ services:
       #- '--smallfiles' 
       - '-f'
       - '/opt/etc/mongod.conf'
+  mysql:  # v8.0
+    build: ./mysql
+    container_name: mysql
+    volumes:
+      - ${RECORD_PWD}/mysql/mysql-files:/var/lib/mysql-files
+    volumes_from:
+      - data_volume
+    ports:
+      - "3306:3306"
+    networks:
+      app-net:
+        ipv4_address: 170.0.0.8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456 #root管理员用户密码
+      TZ: Asia/Shanghai # 设置容器时区与宿主机保持一致
+    command:
+      - 'mysqld' 
+      - '--defaults-file=/opt/etc/my.cnf'
   redis:  # v6.0
     build: ./redis
     container_name: redis

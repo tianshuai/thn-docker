@@ -20,6 +20,7 @@
 > ----default.conf  
 > ----thn.conf    
 > ---mongod.conf  
+> ---my.cnf  
 > ---redis.conf  
 > --data_volume/  
 > ---Dockerfile  
@@ -29,6 +30,8 @@
 > ---Dockerfile  
 > --mongo/  
 > ---Dockerfile  
+> --mysql/
+> ---Dockerfile
 > --redis/  
 > ---Dockerfile  
 
@@ -40,7 +43,11 @@
 > --mongo/  
 > ---db/  
 > ---log/  
-> --redis/  
+> --mysql/  
+> ---db/  
+> ---log/   
+> ---mysql-files  
+> --redis/    
 > ---db/  
 > ---log/  
 > --centos/  
@@ -63,4 +70,5 @@
 * 查看运行的容器：`docker ps`
 * 查看所有容器：`docker ps -a`
 * 查看所有镜像：`docker images`
+* 进入容器终端：`docker-compose exec #container_name# sh`
 
