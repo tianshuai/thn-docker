@@ -20,6 +20,7 @@ RUN yum -y install gcc mesa-libGL.x86_64 python38 python38-devel && \
 
 # node
 RUN yum -y install nodejs && \
+    npm install -g gulp && \
     yum clean all
 
 # libreoffice库
