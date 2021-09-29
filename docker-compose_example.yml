@@ -72,6 +72,7 @@ services:
       - '/opt/etc/redis.conf'
   centos:  # centos8
     build: ./centos
+    tty: true
     container_name: centos
     volumes_from:
       - data_volume
@@ -79,7 +80,11 @@ services:
       app-net:
         ipv4_address: 170.0.0.5
     ports:
+      - "8001:8001"
       - "8004:8004"
+      - "8002:8002"
+      - "8003:8003"
+      - "8005:8005"
 networks:
   app-net:
     driver: bridge
